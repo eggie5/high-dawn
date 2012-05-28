@@ -1,6 +1,7 @@
 require 'twitter'
 require 'ap'
 require 'yaml'
+require 'redis'
 
 s= Twitter.rate_limit_status.remaining_hits.to_s + " Twitter API request(s) remaining this hour"
 puts s
@@ -33,19 +34,17 @@ relationships=[]
   relationships.concat _relationships
 end
 
-bros=[]
-non_bros=[]
+redis = Redis.new
+timestamp=Time.now.strftime("%Y-%m-%d--%H:%M")
+rf_key ="#{user_handle}_rf_at_#{timestamp}" #reciprocated_friends
+urf_key="#{user_handle}_urf_at_#{timestamp}" #unreciprocated_friends
+p rf_key ##eggie5_urf_at_2012-05-27--22:40
 
-relationships.each do |relationship|
-  if relationship.connections.include? "followed_by"
-    bros.push relationship.name
+relationships.each do |r|
+  if r.connections.include? "followed_by" #these people follow you back
+    p redis.sadd rf_key, r.id
   else
-    non_bros.push relationship.name
+    p redis.sadd urf_key, r.id #these people don't
   end
 end
-
-ap bros
-
-ap non_bros
-
 
