@@ -18,33 +18,30 @@ end
 user_handle="eggie5"
 user_id = Twitter.user(user_handle).id
 
-bros=[]
-not_bros=[]
-
 #get people youre following
-following=Twitter.friend_ids(user_id)
+following=Twitter.friend_ids(user_id).ids
+followers=Twitter.follower_ids(user_id).ids
 
-relationships=[]
-#feed following people to friendships/lookup twitter API
-#only takes 100 id's at a time have to page results
-(following.ids.length/100).times do |i|
-  start_index=100*i
-  end_index=99*(i+1)
-  _relationships=Twitter.friendships(following.ids[start_index..end_index])
-  relationships.concat _relationships
-end
+mutual_friends=bros=following & followers
+non_bros=following-mutual_friends
+i_need_to_follow=followers-mutual_friends
 
-redis = Redis.new
+p "following: #{following.length}"
+p "followers: #{followers.length}"
+p "bros: #{bros.length}"
+p "non-bros: #{non_bros.length}"
+p "im not following back: #{i_need_to_follow.length}"
+
+
+#
+REDIS = Redis.new
 timestamp=Time.now.strftime("%Y-%m-%d--%H:%M")
-rf_key ="#{user_handle}_rf_at_#{timestamp}" #reciprocated_friends
-urf_key="#{user_handle}_urf_at_#{timestamp}" #unreciprocated_friends
-p rf_key ##eggie5_urf_at_2012-05-27--22:40
+following_key ="#{user_handle}_following_at_#{timestamp}" #reciprocated_friends
+followers_key="#{user_handle}_followers_at_#{timestamp}" #unreciprocated_friends
+p following_key ##eggie5_urf_at_2012-05-27--22:40
 
-relationships.each do |r|
-  if r.connections.include? "followed_by" #these people follow you back
-    p redis.sadd rf_key, r.id
-  else
-    p redis.sadd urf_key, r.id #these people don't
-  end
-end
+following.each{|id| REDIS.sadd(following_key, id)}
+followers.each{|id| REDIS.sadd(followers_key, id)}
 
+REDIS.rpush "#{user_handle}_following_snapshots", following_key
+REDIS.rpush "#{user_handle}_followers_snapshots", followers_key
