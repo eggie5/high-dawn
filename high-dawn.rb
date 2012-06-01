@@ -44,12 +44,8 @@ following_key ="#{user_handle}_following_at_#{timestamp}" #reciprocated_friends
 followers_key="#{user_handle}_followers_at_#{timestamp}" #unreciprocated_friends
 p following_key ##eggie5_urf_at_2012-05-27--22:40
 
-REDIS.pipelined do
-  following.each{|id| REDIS.sadd(following_key, id)}
-  followers.each{|id| REDIS.sadd(followers_key, id)}
-end
-
+REDIS.sadd(following_key, following)
+REDIS.sadd(followers_key, followers)
 
 REDIS.rpush "#{user_handle}_following_snapshots", following_key
 REDIS.rpush "#{user_handle}_followers_snapshots", followers_key
-
