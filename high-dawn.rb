@@ -34,14 +34,22 @@ p "im not following back: #{i_need_to_follow.length}"
 
 
 #
-REDIS = Redis.new
+#REDIS = Redis.new
+ENV["REDISTOGO_URL"] = 'redis://redistogo:f793febde5cb91ab39a7e1223be904bc@scat.redistogo.com:9198'
+uri = URI.parse(ENV["REDISTOGO_URL"])
+REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+
 timestamp=Time.now.strftime("%Y-%m-%d--%H:%M")
 following_key ="#{user_handle}_following_at_#{timestamp}" #reciprocated_friends
 followers_key="#{user_handle}_followers_at_#{timestamp}" #unreciprocated_friends
 p following_key ##eggie5_urf_at_2012-05-27--22:40
 
-following.each{|id| REDIS.sadd(following_key, id)}
-followers.each{|id| REDIS.sadd(followers_key, id)}
+REDIS.pipelined do
+  following.each{|id| REDIS.sadd(following_key, id)}
+  followers.each{|id| REDIS.sadd(followers_key, id)}
+end
+
 
 REDIS.rpush "#{user_handle}_following_snapshots", following_key
 REDIS.rpush "#{user_handle}_followers_snapshots", followers_key
+
