@@ -56,3 +56,18 @@ REDIS.pipelined do
   REDIS.rpush "uid:#{user_id}:unreciprocated_friends_snapshots", unreciprocated_friends_key
   REDIS.rpush "uid:#{user_id}:reciprocated_friends_snapshots", reciprocated_friends_key
 end
+
+#cache user names
+[following, followers].each do |tuids|
+  screen_names=[]
+  tuids.each_slice(99).to_a.each do |arr|
+    _screen_names=Twitter.friendships(arr).map{|user| [user.screen_name, user.id]}
+    _screen_names.each do |screen_name|
+      puts "tuid:#{screen_name[1]}"
+      REDIS.pipelined do
+        REDIS.set("tuid:#{screen_name[1]}", screen_name[0])
+      end
+    end
+    screen_names.concat _screen_names
+  end
+end
