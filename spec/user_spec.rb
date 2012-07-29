@@ -1,77 +1,115 @@
-require './models/user'
+require './spec/spec_helper'
 
 describe User do
 
-  it "should show current non-bros" do
-    today=now=Time.now
-    day=86400
+  it "should show date someone followed me" do
+    u=get_user2()
+    id=4
+    ts=5.days.ago
+    u.add_follower(ts, id) 
+    #added a follower 5 days ago
 
-    u=User.new
-    me=3
-    u.id=me
-
-    u.friends.add(now, me, :follow, 4)
-    u.non_bros.length.should eq 1
-
-    u.friends.add(now, me, :follow, 5)
-    u.non_bros.length.should eq 2
+    followers = u.followers(at: Time.now)
+    follower=followers.first
+    follower.id.should eq id
+    
+    follower.timestamp.day.should eq ts.day
   end
 
-  it "should have a followers timeline" do
+  it "should show when somebody became a bro" do
     u=User.new
-    today=now=Time.now
-    day=86400
+    u.id=1
+    u.add_friend(10.days.ago, 2)
+    u.add_friend(8.days.ago, 3)
+    u.add_friend(6.days.ago, 4)
+    id=3
+    u.add_follower(5.days.ago, id)
+    u.add_friend(4.days.ago, 5)
 
-    u.followers.add(now-day*3, 3, :follow, 2)
-    u.followers.add(now-day*2, 3, :unfollow, 2)
-    u.followers.add(now-day,   3, :follow, 5) # a day ago
-    u.followers.add(now,       3, :follow, 4)
+
+    bros=u.bros(at: Time.now) #accumulated collection as of NOW
+    bros.length.should eq 1
+
+    bro=u.bros.first
+    bro.id.should eq id
+
+  end
+
+  it "should show current bros" do
+    u=User.new
+    u.id=me=1
+    u.add_friend( 4)
+    u.add_friend( 5)
+    u.add_follower(4)
+
+
+    friends = u.friends(at: Time.now)
+    followers = u.followers(at: Time.now)
+    bros=u.bros(at: Time.now)
+
+    bros.length.should eq 1
+    p "bros= #{bros}"
+    bros[0].id.should eq 4
+  end
+
+  it "should show current non-bros" do
+    u=User.new
+    u.id=me=1
+    u.add_friend(4)
+    u.add_friend(5)
+    u.add_follower(4)
+
+
+    friends = u.friends(at: Time.now)
+    followers = u.followers(at: Time.now)
+    nbs=u.non_bros(at: Time.now)
+
+    nbs.length.should eq 1
+    nbs[0].id.should eq 5
+  end
+
+  it "should add followers" do
+    u=User.new
+    u.add_follower(3.days.ago, 2)
+    u.add_follower(2.days.ago,  2)
+    u.add_follower(1.day.ago,   5) # a day ago
+    u.add_follower(4) #now
+
+    u.followers.length.should eq 4
 
 
   end
 
   it "should have a current list of friends" do
 
-    u=User.new
-    now=Time.now
-    day=86400
-    u.friends.add(now-day*3, 3, :follow, 2)
-    u.friends.add(now-day*2, 3, :follow, 2)
-    u.friends.add(now-day,   3, :follow, 5) # a day ago
-    u.friends.add(now,       3, :follow, 4)
-    u.friends.add(now-day*3, 3, :follow, 2)
-    u.friends.add(now-day*2, 3, :follow, 2)
-    u.friends.add(now-day,   3, :follow, 5) # a day ago
-    u.friends.add(now,       3, :follow, 4)
+    u=get_user4();
 
-    u.friends.length.should eq 8
+    u.friends(at: Time.now).length.should eq 8
 
   end
 
-  it "should have a list of friends yesterday" do
-    u=User.new
 
-    today=now=Time.now
-    day=86400
+  it "should get a list of friends/followers on certain date" do
+    u=user1
+    
+    u.friends(at: 3.days.ago).length.should eq 1 # accumulated collection as of 3 days ago
+    u.friends(at: 2.days.ago).length.should eq 0
+    u.friends(at: 1.day.ago).length.should eq 1
 
-    u.friends.add(now-day*3, 3, :follow, 2)
-    u.friends.add(now-day*2, 3, :unfollow, 2)
-    u.friends.add(now-day,   3, :follow, 5) # a day ago
-    u.friends.add(now,       3, :follow, 4)
-
-    # 3 days ago
-    u.friends(at: today-day*3).length.should eq 1
-
-    #freinds day before yest
-    u.friends(at: today-day*2).length.should eq 0
-
-    #how check my friends on yesterday
-    u.friends(at: today-day).length.should eq 1
-
-    #friends now
-    friends= u.friends(at: Time.now)
-    friends.should eq [5,4]
-    friends.length.should eq 2
+    friends= u.friends(at: Time.now) # accumulated collection as of NOW
+    friends.ids.should eq [5,4]
+    friends.ids.length.should eq 2
 
   end
+
+end
+
+def user1
+  u=User.new
+  u.id=1
+  u.add_friend(3.days.ago, 2)
+  u.remove_friend(2.days.ago, 2) #unfollow
+  u.add_friend(1.day.ago, 5) # a day ago
+  u.add_friend(4) #now
+  u
 end

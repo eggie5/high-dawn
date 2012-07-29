@@ -1,19 +1,45 @@
 require './models/model'
 require 'time'
 
+class Friendship
+  attr_accessor :timestamp, :id
+
+  def initialize()
+  end
+
+  def eql?(o)
+    self==(o)
+  end
+
+  def hash
+    prime = 31;
+    result = 1;
+    result = prime * result + ((id == nil) ? 0 : id.hash);
+    #result = prime * result + ((timestamp == nil) ? 0 : timestamp.to_s.hash);
+    result
+  end
+
+  def ==(o)
+    id==o.id # &&
+    #     timestamp.year==o.timestamp.year &&
+    #     timestamp.month==o.timestamp.month &&
+    #     timestamp.day==o.timestamp.day
+  end
+end
+
 class Timeline < Model
   attr_reader :length
   def initialize()
-
     @length=0
     @hash={}
   end
 
-  def add(time, id1, action, id2)
-    ts=time.strftime("%Y.%m.%d")
-    struct={event: action,
-      follower: id1,
-    followee: id2}
+  #time, id1, action, id2
+  def add(options={})
+    ts=options[:time].strftime("%Y.%m.%d")
+    struct={  event: options[:action],
+      follower: options[:follower],
+    followee: options[:followee] }
 
     @hash[ts]=[] if @hash[ts].nil?
 
@@ -22,21 +48,28 @@ class Timeline < Model
     @length+=1
   end
 
-  def get(at)
+  def get(at, user_id)
     collection=[]
     @hash.each do |key, value|
       if(Time.parse(key)<=at)
         value.each do |val|
           if(val[:event]==:follow)
-            collection.push val[:followee]
+            id= (val[:followee]== user_id )? val[:follower] : val[:followee]
+            f=Friendship.new
+            f.timestamp=Time.parse(key)
+            f.id=id
+            collection.push f
           elsif(val[:event]==:unfollow)
-            collection.delete val[:followee]
+            id= (val[:followee]== user_id )? val[:follower] : val[:followee]
+            f=Friendship.new
+            f.timestamp=Time.parse(key)
+            f.id=id
+            collection.delete f
           end
-          
+
         end
       end
     end
     collection
   end
 end
-
