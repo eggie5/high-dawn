@@ -32,7 +32,7 @@ end
 
 describe Friendship do
   it "should work w/ set logic" do
-    
+
     f1=Friendship.new
     f1.id=1
     f1.timestamp=10.days.ago
@@ -53,10 +53,12 @@ describe Friendship do
     b=[f2, f3]
 
     inter = b & a
-    
+
     inter.length.should eq 1
     inter[0].id.should eq f2.id
     inter[0].timestamp.should eq f2.timestamp
 
   end
+
+
 end

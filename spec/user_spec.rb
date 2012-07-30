@@ -1,4 +1,5 @@
 require './spec/spec_helper'
+require 'ap'
 
 def user_with_bro_who_has_tweets
   u=User.new
@@ -68,6 +69,7 @@ describe User do
     bros.length.should eq 2
     bros[0].id.should eq id1
     bros[1].id.should eq id2
+    
   end
 
   it "should show current non-bros" do
@@ -83,22 +85,27 @@ describe User do
     nbs[0].id.should eq 5
   end
 
-  it "should add followers" do
+  it "should add/remove followers" do
     u=User.new
     u.add_follower(3.days.ago, 2)
-    u.add_follower(2.days.ago,  2)
+    u.add_follower(2.days.ago,  3)
     u.add_follower(1.day.ago,   5) # a day ago
     u.add_follower(4) #now
 
     u.followers.length.should eq 4
-
+    
+    u.remove_follower(4)
+    u.remove_follower(5)
+    u.remove_follower(3)    
+    u.remove_follower(2)    
+    u.followers.length.should eq 0
 
   end
 
   it "should have a current list of friends" do
     u=get_user4();
 
-    u.friends(at: Time.now).length.should eq 8
+    u.friends.length.should eq 8
 
   end
 
@@ -114,6 +121,18 @@ describe User do
 
     friends.ids.should eq [5,4]
 
+  end
+  
+  it "should show the data structure" do
+    u=User.new;u.id=1
+    u.add_friend(10.days.ago,2)
+    u.add_friend(7.days.ago,3)
+    u.add_follower(6.days.ago, 4)
+    u.add_friend(6.days.ago, 23)
+    u.add_friend(6.days.ago, 33);
+    u.remove_friend(5.days.ago, 2)
+    
+    ap u
   end
 
 end

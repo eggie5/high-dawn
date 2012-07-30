@@ -1,5 +1,5 @@
-require './models/model'
-require './models/timeline'
+require_relative 'model'
+require_relative 'timeline'
 require 'time'
 
 
@@ -49,14 +49,10 @@ class User < Model
   end
 
   def friends(options={})
-    at=options[:at]
-    if at
-      ts=at.strftime("%Y.%m.%d")
+    at=options[:at] || Time.now
+    ts=at.strftime("%Y.%m.%d")
 
-      @friends.get Time.parse(ts), self.id
-    else
-      @friends #return all
-    end
+    @friends.get Time.parse(ts), self.id
   end
 
   def followers(options={})

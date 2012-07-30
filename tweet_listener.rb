@@ -23,7 +23,7 @@ require 'logger'
 require './webapp/app/models/user.rb'
 
 dbconfig = YAML::load(File.open('./webapp/config/database.yml'))
-ap dbconfig
+# ap dbconfig
 ActiveRecord::Base.establish_connection(dbconfig['development'])
 ActiveRecord::Base.logger = Logger.new(STDERR)
 
@@ -38,7 +38,7 @@ end
 #collect list of all non_bros for every user
 ids=[]
 User.all .each do |user|
-  user_ids=user.snapshot({at: :last, for: :non_bros}).map{|id|id.to_i}
+  user_ids=user.snapshot({at: :last, for: :non_bros})
   ids.concat user_ids
 end
 
@@ -60,24 +60,36 @@ end
 #539428398 dick cheney
 
 p "listening..."
-TweetStream::Client.new.follow(ids) do |status|
+client=TweetStream::Client.new
+
+client.on_limit do |skip_count|
+  p "rate limit. skip_count=#{skip_count}"
+end
+
+client.on_error do |message|
+  p "error: #{message}"
+end
+
+client.follow([539428398]) do |tweet|
   #puts "#{status.user.name} (#{status.user.id}): #{status.id}"
   puts "."
-  tuid=status.user.id
-  obj={id: status.id, uid: status.user.id, text: status.text }
-  
-  #cache id -> uname for O(1) lookup
-  REDIS.set("tuid:#{tuid}", status.user.screen_name)
-  
-  #return if status.text.contains("RT") #skip a retweet
+  tuid=tweet.user.id
+  obj={id: tweet.id, uid: tuid, text: tweet.text }
 
-  #get a list of people following this tweet owner
-  #twitter uid -> user id lookup
+  #cache id -> uname for O(1) lookup
+  REDIS.set("tuid:#{tuid}", tweet.user.screen_name)
+
+  return if ((tweet.text=~ /RT/)!=nil) #skip a retweet
+  
+  #get a list of users following this tweet's owner
   uid_list=REDIS.smembers("tuid:#{tuid}:followers")||[]
+  p "uid_list= #{uid_list}"
+  p "tuid:#{tuid}:followers"
+  p "followers=#{uid_list}"
   uid_list.each do |uid|
     queue_key="user:#{uid}:pending_tweet_list"
     REDIS.rpush queue_key, obj.to_json
-    puts "pushed #{status.id} to #{queue_key}"
+    puts "pushed #{tweet.id} to #{queue_key}"
   end
 
 end

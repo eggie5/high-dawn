@@ -1,4 +1,4 @@
-require './models/model'
+require_relative 'model'
 require 'time'
 
 class FriendshipCollection < Array
