@@ -1,5 +1,6 @@
 require './models/user'
 require './models/timeline'
+require './models/model'
 require 'active_support/all'
 
 

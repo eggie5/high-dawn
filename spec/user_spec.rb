@@ -11,26 +11,39 @@ def user_with_bro_who_has_tweets
 end
 
 describe User do
+  
+  it 'should my followers between april and november' do 
+    u=User.new;u.id=1
+    
+    u.followers(from: 10.days.ago, to: 2.days.ago)
+  end
 
   it "UC #3 - bro should have associated tweets" do
     u=user_with_bro_who_has_tweets
 
-    bro=u.bros(at: Time.now).first
+    bro=u.bros(from: Time.now).first
 
     #check for all tweets to this bro
     bro.tweets.length.should eq 0
   end
 
   it "UC #2 - should show date someone followed me" do
-    u=get_user2()
+    u=User.new; u.id=1
+    u.add_friend(10.days.ago,  4)
+    u.add_friend(9.days.ago, 5)
+    
     new_follower=f={id:4, ts:5.days.ago}
     u.add_follower(f[:ts], f[:id])
     #added a follower 5 days ago
+    ap u
 
+    u.followers.length.should eq 1
     follower = u.followers.first
     follower.id.should eq new_follower[:id]
 
     follower.timestamp.day.should eq new_follower[:ts].day
+    
+
   end
 
   it "UC #1 - should show when somebody became a bro" do
@@ -113,11 +126,11 @@ describe User do
   it "should get a list of friends/followers on certain date" do
     u=user1
 
-    u.friends(at: 3.days.ago).length.should eq 1 # accumulated collection as of 3 days ago
-    u.friends(at: 2.days.ago).length.should eq 0
-    u.friends(at: 1.day.ago).length.should eq 1
+    u.friends(from: 3.days.ago).length.should eq 1 # accumulated collection as of 3 days ago
+    u.friends(from: 2.days.ago).length.should eq 0
+    u.friends(from: 1.day.ago).length.should eq 1
 
-    friends= u.friends(at: Time.now) # accumulated collection as of NOW
+    friends= u.friends(from: Time.now) # accumulated collection as of NOW
 
     friends.ids.should eq [5,4]
 
@@ -132,7 +145,7 @@ describe User do
     u.add_friend(6.days.ago, 33);
     u.remove_friend(5.days.ago, 2)
     
-    ap u
+    
   end
 
 end

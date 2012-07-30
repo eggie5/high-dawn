@@ -1,32 +1,27 @@
 require_relative 'model'
 require_relative 'timeline'
-require 'time'
-
-
 
 class User < Model
   attr_accessor :id, :email, :tuid
   def initialize()
-    @friends=Timeline.new()
-    @followers=Timeline.new()
+    super
   end
 
   def add_friend(ts=Time.now, id)
-    @friends.add(time: ts, follower: self.id, action: :follow, followee: id)
+    add(time: ts, follower: self.id, action: :follow, followee: id)
   end
 
   def remove_friend(ts=Time.now, id)
-    @friends.add(time: ts, follower: self.id, action: :unfollow, followee: id)
+    add(time: ts, follower: self.id, action: :unfollow, followee: id)
   end
 
   def add_follower(ts=Time.now, id)
-    @followers.add(time: ts, follower: id, action: :follow, followee: self.id)
+    add(time: ts, follower: id, action: :follow, followee: self.id)
   end
 
   def remove_follower(ts=Time.now, id)
-    @followers.add(time: ts, follower: id, action: :unfollow, followee: self.id)
+     add(time: ts, follower: id, action: :unfollow, followee: self.id)
   end
-
 
 
   def followers=(followers)
@@ -34,9 +29,9 @@ class User < Model
   end
 
   def bros(options={})
-    at=options[:at] || Time.now
-    friends=friends(at: at)
-    followers=followers(at: at)
+    at=options[:from] || Time.now
+    friends=friends(from: at)
+    followers=followers(from: at)
     inter=(followers & friends)
     f=FriendshipCollection.new()
     f.set(inter)
@@ -44,22 +39,22 @@ class User < Model
   end
 
   def non_bros(options={})
-    at=options[:at] || Time.now
-    (friends(at: at) - bros(at: at))
+    at=options[:from] || Time.now
+    (friends(from: at) - bros(from: at))
   end
 
   def friends(options={})
-    at=options[:at] || Time.now
-    ts=at.strftime("%Y.%m.%d")
+    from=options[:from] || Time.now
+    to=options[:to] || Time.now
 
-    @friends.get Time.parse(ts), self.id
+    read(from, to, self.id, :friends)
   end
 
   def followers(options={})
-    at=options[:at] || Time.now
-    ts=at.strftime("%Y.%m.%d")
+    from=options[:from] || Time.now
+    to=options[:to] || Time.now
 
-    @followers.get Time.parse(ts), self.id
+    read(from, to, self.id, :followers)
   end
 
   def friends=(friends)
