@@ -3,6 +3,7 @@ require './models/timeline'
 require 'time'
 
 
+
 class User < Model
   attr_accessor :id, :email, :tuid
   def initialize()
@@ -15,7 +16,7 @@ class User < Model
   end
 
   def remove_friend(ts=Time.now, id)
-     @friends.add(time: ts, follower: self.id, action: :unfollow, followee: id)
+    @friends.add(time: ts, follower: self.id, action: :unfollow, followee: id)
   end
 
   def add_follower(ts=Time.now, id)
@@ -34,9 +35,12 @@ class User < Model
 
   def bros(options={})
     at=options[:at] || Time.now
-    friends=friends(at: at) 
+    friends=friends(at: at)
     followers=followers(at: at)
-    (friends & followers)
+    inter=(followers & friends)
+    f=FriendshipCollection.new()
+    f.set(inter)
+    f
   end
 
   def non_bros(options={})
@@ -54,16 +58,12 @@ class User < Model
       @friends #return all
     end
   end
-  
-  def followers(options={})
-    at=options[:at]
-    if at
-      ts=at.strftime("%Y.%m.%d")
 
-      @followers.get Time.parse(ts), self.id
-    else
-      @followers #return all
-    end
+  def followers(options={})
+    at=options[:at] || Time.now
+    ts=at.strftime("%Y.%m.%d")
+
+    @followers.get Time.parse(ts), self.id
   end
 
   def friends=(friends)

@@ -1,10 +1,32 @@
 require './models/model'
 require 'time'
 
+class FriendshipCollection < Array
+  
+  def set(arr)
+    replace arr
+  end
+  
+  def ids
+    self.collect{|friendship|friendship.id}
+  end
+  
+  
+  
+end
+
 class Friendship
   attr_accessor :timestamp, :id
 
   def initialize()
+  end
+  
+  def tweets=(arr)
+  end
+  
+  def tweets
+    #do DB lookup for tweets?
+    []
   end
 
   def eql?(o)
@@ -49,7 +71,7 @@ class Timeline < Model
   end
 
   def get(at, user_id)
-    collection=[]
+    collection=FriendshipCollection.new
     @hash.each do |key, value|
       if(Time.parse(key)<=at)
         value.each do |val|

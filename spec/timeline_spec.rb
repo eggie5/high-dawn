@@ -32,24 +32,31 @@ end
 
 describe Friendship do
   it "should work w/ set logic" do
+    
     f1=Friendship.new
     f1.id=1
-    f1.timestamp=3.days.ago
+    f1.timestamp=10.days.ago
 
     f2=Friendship.new
     f2.id=1
-    f2.timestamp=5.days.ago
+    ts=5.days.ago
+    f2.timestamp=ts
 
     f3=Friendship.new
     f3.id=2
-    f3.timestamp=10.days.ago
+    f3.timestamp=3.days.ago
 
+    #this says i was friends with f1 at sample a
+    #and I was frinds w/ f1 & f2 on sample b
+    #now find the intersection. it should return f2
     a=[f1]
     b=[f2, f3]
 
     inter = b & a
     
-    inter.should eq [f1]
+    inter.length.should eq 1
+    inter[0].id.should eq f2.id
+    inter[0].timestamp.should eq f2.timestamp
 
   end
 end
