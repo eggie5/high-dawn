@@ -1,3 +1,5 @@
+require 'redis'
+
 class Model
 
   #THIS IS ALL TEMP UNTIL PERSISTANCE LOGIC ADDED
@@ -5,22 +7,11 @@ class Model
   def initialize()
     @length=0
     @hash={}
+    @r=Redis.new
   end
   #THIS IS ALL TEMP UNTIL PERSISTANCE LOGIC ADDED
 
-  #time, id1, action, id2
-  def add(options={})
-    ts=options[:time]
-    struct={  event: options[:action],
-      follower: options[:follower],
-    followee: options[:followee] }
 
-    @hash[ts]=[] if @hash[ts].nil?
-
-    @hash[ts].push struct
-
-    @length+=1
-  end
 
   #put persistance logic here
   #redis, postgres, mongo???
@@ -28,14 +19,27 @@ class Model
     friends.each do |friend|
       ts=friend.timestamp.to_i
       fid=friend.id
-      base="users:#{id}:followers:timestamp:#{ts}:"
+      p base="users:#{id}:timestamp:#{ts}"
 
-      event_key=base+"event=follow"
-      follower_key=base+"follower=#{fid}"
-      followee_key=base+"followee=#{id}"
-      puts event_key
-      puts follower_key
-      puts followee_key
+      event_key=base+"event"
+      follower_key=base+"follower"
+      followee_key=base+"followee"
+      
+      obj={event: :follow, follower: id, followee: fid}
+      p @r.sadd base, obj
+      puts ""
+    end
+    followers.each do |friend|
+      ts=friend.timestamp.to_i
+      fid=friend.id
+      p base="users:#{id}:timestamp:#{ts}"
+
+      event_key=base+"event"
+      follower_key=base+"follower"
+      followee_key=base+"followee"
+      
+      obj={event: :follow, follower: fid, followee: id}
+      p @r.sadd base, obj
       puts ""
     end
   end

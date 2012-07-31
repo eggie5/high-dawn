@@ -3,15 +3,9 @@ require 'time'
 
 class FriendshipCollection < Array
   
-  def set(arr)
-    replace arr
-  end
-  
   def ids
     self.collect{|friendship|friendship.id}
   end
-  
-  
   
 end
 

@@ -22,6 +22,20 @@ class User < Model
   def remove_follower(ts=Time.now, id)
      add(time: ts, follower: id, action: :unfollow, followee: self.id)
   end
+  
+  #time, id1, action, id2
+  def add(options={})
+    ts=options[:time]
+    struct={  event: options[:action],
+      follower: options[:follower],
+    followee: options[:followee] }
+
+    @hash[ts]=[] if @hash[ts].nil?
+
+    @hash[ts].push struct
+
+    @length+=1
+  end
 
 
   def followers=(followers)
@@ -34,7 +48,7 @@ class User < Model
     followers=followers(from: at)
     inter=(followers & friends)
     f=FriendshipCollection.new()
-    f.set(inter)
+    f.replace(inter)
     f
   end
 

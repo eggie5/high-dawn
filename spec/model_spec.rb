@@ -1,52 +1,52 @@
 require './spec/spec_helper'
+require 'redis'
+require 'ap'
 
 describe Model do
   it "should propery deseralize data structure from redis keys" do
     #seed redis
-    #Redis.put "users:1:followers:timestamp:1343636608:event"
-    
+    u=User.new;u.id=1
+    t=100.days.ago
+    u.add_friend(t,3)
+    u.save
+
     m=Model.new
-    timeline = m.read(1.week.ago, Time.now, 1, :friends)
+    resp = m.read(100.days.ago, Time.now, u.id, :friends)
+    # resp.class.should eq FriendshipColllection
   end
-  
+
   it "should property seralize data structure to redis keys" do
     #build DS in memory
     u=User.new;u.id=1
-    u.add_friend(3)
-    u.add_follower(1)
-    
-    #u.save
+    t=Time.now
+    u.add_friend(t,3)
+    u.save
+
+    r=Redis.new
+    membs = r.smembers "users:#{u.id}:timestamp:#{t.to_i}"
+    f=membs.collect{|str| eval str }[0]
+    f[:event].should eq :follow
+    f[:follower].should eq u.id
+    f[:followee].should eq 3
+
+
+    u.add_follower(t,5)
+    u.save
+
+    a=r.smembers("users:#{u.id}:timestamp:#{t.to_i}").collect{|str| eval str}
+
+    a[0][:event].should eq :follow
+    a[0][:follower].should eq 5
+    a[0][:followee].should eq u.id
+
+    a[1][:event].should eq :follow
+    a[1][:follower].should eq u.id
+    a[1][:followee].should eq 3
+
+
+
   end
-  
-  describe Model, "#add" do
-    it "adds even to timeline" do
-      timeline=Model.new
 
-      today=Time.now
-      timeline.add(time: today, followee: 3, action: :follow, follower: 4)
-      timeline.add(time: today, followee: 3, action: :unfollowed, follower: 5);
-
-      timeline.length.should eq(2)
-
-    end
-  end
-
-  describe Model, "#get" do
-    it "should get a collection of users at a certain point in time" do
-      t=Model.new
-      t.add(time: 3.days.ago, followee: 2, action: :follow, follower: 1)
-      t.add(time: 2.days.ago, followee: 3, action: :follow, follower: 1)
-      t.add(time: 1.days.ago, followee: 4, action: :follow, follower: 1)
-      t.add(time: Time.now,   followee: 5, action: :follow, follower: 1)
-      ########### end setup
-
-      friends=t.read(Time.now, nil, 1, :friends)
-      friends.length.should eq 4
-      friend=friends[0]
-      friend.timestamp.day.should eq 3.days.ago.day
-      friend.id.should eq 2
-    end
-  end
 
   describe Friendship do
     it "should work w/ set logic" do
@@ -80,5 +80,5 @@ describe Model do
 
 
   end
-  
+
 end
