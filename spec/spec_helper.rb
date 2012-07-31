@@ -2,8 +2,30 @@ require './models/user'
 require './models/timeline'
 require './models/model'
 require 'active_support/all'
+require 'redis'
 
+RSpec.configure do |config|
+  config.before(:suite) do
+    puts "before suite"
+    r=Redis.new
+    p r.flushall
+  end
 
+  config.before(:all) do
+  end
+
+  config.before(:each) do
+  end
+
+  config.after(:each) do
+  end
+
+  config.after(:all) do
+  end
+
+  config.after(:suite) do
+  end
+end
 
 def get_user1
   today=now=Time.now
@@ -45,6 +67,7 @@ end
 
 def get_user4()
   u=User.new
+  u.id=7
   now=Time.now
   day=86400
   u.add_friend(3.days.ago, 2)

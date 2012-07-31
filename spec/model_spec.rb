@@ -6,20 +6,25 @@ describe Model do
   it "should propery deseralize data structure from redis keys" do
     #seed redis
     u=User.new;u.id=1
-    t=100.days.ago
-    u.add_friend(t,3)
+    t=110.days.ago
+    tid=33
+    u.add_friend(t, tid)
     u.save
 
+    #this should populate a new hash from redis
     m=Model.new
-    resp = m.read(100.days.ago, Time.now, u.id, :friends)
-    # resp.class.should eq FriendshipColllection
+    friends = m.read(t, nil, u.id, :friends)
+    friends.class.should eq FriendshipCollection
+    friends.length.should eq 1
+    friends[0].id.should eq tid
+
   end
 
   it "should property seralize data structure to redis keys" do
     #build DS in memory
     u=User.new;u.id=1
-    t=Time.now
-    u.add_friend(t,3)
+    t=97.days.ago
+    u.add_friend(t,32)
     u.save
 
     r=Redis.new
@@ -27,7 +32,7 @@ describe Model do
     f=membs.collect{|str| eval str }[0]
     f[:event].should eq :follow
     f[:follower].should eq u.id
-    f[:followee].should eq 3
+    f[:followee].should eq 32
 
 
     u.add_follower(t,5)
@@ -41,7 +46,7 @@ describe Model do
 
     a[1][:event].should eq :follow
     a[1][:follower].should eq u.id
-    a[1][:followee].should eq 3
+    a[1][:followee].should eq 32
 
 
 

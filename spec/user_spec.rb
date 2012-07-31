@@ -28,11 +28,13 @@ describe User do
   end
 
   it "UC #2 - should show date someone followed me" do
-    u=User.new; u.id=1
+    u=User.new; u.id=88
     u.add_friend(10.days.ago,  4)
     u.add_friend(9.days.ago, 5)
+    u.save
+    u.friends.length.should eq 2
 
-    new_follower=f={id:4, ts:5.days.ago}
+    new_follower=f={id:4, ts:53.days.ago}
     u.add_follower(f[:ts], f[:id])
     #added a follower 5 days ago
 
@@ -98,7 +100,7 @@ describe User do
   end
 
   it "should add/remove followers" do
-    u=User.new
+    u=User.new;u.id=9
     u.add_follower(3.days.ago, 2)
     u.add_follower(2.days.ago,  3)
     u.add_follower(1.day.ago,   5) # a day ago
@@ -123,7 +125,12 @@ describe User do
 
 
   it "should get a list of friends/followers on certain date" do
-    u=user1
+    u=User.new
+    u.id=1
+    u.add_friend(3.days.ago, 2)
+    u.remove_friend(2.days.ago, 2) #unfollow
+    u.add_friend(1.day.ago, 5) # a day ago
+    u.add_friend(4) #now
 
     u.friends(from: 3.days.ago).length.should eq 1 # accumulated collection as of 3 days ago
     u.friends(from: 2.days.ago).length.should eq 0
@@ -132,18 +139,6 @@ describe User do
     friends= u.friends(from: Time.now) # accumulated collection as of NOW
 
     friends.ids.should eq [5,4]
-
-  end
-
-  it "should show the data structure" do
-    u=User.new;u.id=1
-    u.add_friend(10.days.ago,2)
-    u.add_friend(7.days.ago,3)
-    u.add_follower(6.days.ago, 4)
-    u.add_friend(6.days.ago, 23)
-    u.add_friend(6.days.ago, 33);
-    u.remove_friend(5.days.ago, 2)
-
 
   end
 

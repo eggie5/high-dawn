@@ -23,7 +23,7 @@ class User < Model
      add(time: ts, follower: id, action: :unfollow, followee: self.id)
   end
   
-  #time, id1, action, id2
+  #addes node to in-memory hash
   def add(options={})
     ts=options[:time]
     struct={  event: options[:action],
@@ -63,6 +63,10 @@ class User < Model
 
     read(from, to, self.id, :friends)
   end
+  
+  def friends=(friends)
+    @friends=friends
+  end
 
   def followers(options={})
     from=options[:from] || Time.now
@@ -71,7 +75,5 @@ class User < Model
     read(from, to, self.id, :followers)
   end
 
-  def friends=(friends)
-    @friends=friends
-  end
+
 end

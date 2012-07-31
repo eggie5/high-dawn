@@ -13,34 +13,20 @@ class Model
 
 
 
-  #put persistance logic here
-  #redis, postgres, mongo???
+  #save shouldn't use read....
+  #this does :(
   def save
-    friends.each do |friend|
-      ts=friend.timestamp.to_i
-      fid=friend.id
-      p base="users:#{id}:timestamp:#{ts}"
-
-      event_key=base+"event"
-      follower_key=base+"follower"
-      followee_key=base+"followee"
-      
-      obj={event: :follow, follower: id, followee: fid}
-      p @r.sadd base, obj
-      puts ""
-    end
-    followers.each do |friend|
-      ts=friend.timestamp.to_i
-      fid=friend.id
-      p base="users:#{id}:timestamp:#{ts}"
-
-      event_key=base+"event"
-      follower_key=base+"follower"
-      followee_key=base+"followee"
-      
-      obj={event: :follow, follower: fid, followee: id}
-      p @r.sadd base, obj
-      puts ""
+    raise "blank id" if id.blank?
+    @hash.each do |timestamp, bucket|
+      bucket.each do |node|
+        event=node[:event]
+        follower=node[:follower]
+        followee=node[:followee]
+        key="users:#{id}:timestamp:#{timestamp.to_i}"
+        puts "saving #{key}"
+        obj=node
+        @r.sadd key, obj
+      end
     end
   end
 
@@ -51,7 +37,6 @@ class Model
   end
 
   def read(from, to, user_id, filter) #filter = :friends | :followers
-    #query redis aand build the correct data structure
     collection=FriendshipCollection.new
 
     @hash.each do |timestamp, bucket|
@@ -91,6 +76,43 @@ class Model
       end
     end
     collection
+    # collection=FriendshipCollection.new
+    #
+    #     key="users:#{user_id}:timestamp:#{from.to_i}"
+    #     puts "read key=#{key}"
+    #     resp=@r.smembers(key)
+    #     arr=deseralize_redis(resp)
+    #
+    #     arr.each do |friendship_hash|
+    #       event=friendship_hash[:event]
+    #       follower=friendship_hash[:follower]
+    #       followee=friendship_hash[:followee]
+    #       f=Friendship.new
+    #       f.timestamp=from
+    #
+    #       case filter
+    #       when :friends
+    #         f.id=followee
+    #         if(event==:follow)
+    #           collection.push f
+    #         elsif(event==:unfollow)
+    #           collection.delete f
+    #         end
+    #       when :followers
+    #         f.id=follower
+    #         if(event==:follow)
+    #           collection.push f
+    #         elsif(event==:unfollow)
+    #           collection.delete f
+    #         end
+    #       end
+    #     end
+    #     collection
+  end
+
+  private
+  def deseralize_redis(r)
+    r.collect{|str| eval str}
   end
 
 end
