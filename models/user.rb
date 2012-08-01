@@ -3,6 +3,7 @@ require_relative 'timeline'
 
 class User < Model
   attr_accessor :id, :email, :tuid
+  attr_reader :hash
   def initialize()
     super
   end
@@ -20,9 +21,9 @@ class User < Model
   end
 
   def remove_follower(ts=Time.now, id)
-     add(time: ts, follower: id, action: :unfollow, followee: self.id)
+    add(time: ts, follower: id, action: :unfollow, followee: self.id)
   end
-  
+
   #addes node to in-memory hash
   def add(options={})
     ts=options[:time]
@@ -33,8 +34,6 @@ class User < Model
     @hash[ts]=[] if @hash[ts].nil?
 
     @hash[ts].push struct
-
-    @length+=1
   end
 
 
@@ -43,9 +42,11 @@ class User < Model
   end
 
   def bros(options={})
-    at=options[:from] || Time.now
-    friends=friends(from: at)
-    followers=followers(from: at)
+    from=options[:from] || 3.years.ago
+    to=options[:to] || Time.now
+
+    friends=friends(from: from, to: to)
+    followers=followers(from: from, to: to)
     inter=(followers & friends)
     f=FriendshipCollection.new()
     f.replace(inter)
@@ -53,24 +54,30 @@ class User < Model
   end
 
   def non_bros(options={})
-    at=options[:from] || Time.now
-    (friends(from: at) - bros(from: at))
+    from=options[:from] || 3.years.ago
+    to=options[:to] || Time.now
+
+    f=friends(from: from, to: to)
+    b=bros(from: from, to: to)
+    (f - b)
   end
 
   def friends(options={})
-    from=options[:from] || Time.now
+    from=options[:from] || 3.years.ago
     to=options[:to] || Time.now
+
 
     read(from, to, self.id, :friends)
   end
-  
+
   def friends=(friends)
     @friends=friends
   end
 
   def followers(options={})
-    from=options[:from] || Time.now
+    from=options[:from] || 3.years.ago
     to=options[:to] || Time.now
+
 
     read(from, to, self.id, :followers)
   end

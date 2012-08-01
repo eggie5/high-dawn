@@ -5,7 +5,8 @@ describe Friendship do
     f=Friendship.new;f.id=1;f.timestamp=3.days.ago
   end
 end
-describe FriendshipCollection do 
+
+describe FriendshipCollection do
   it "should act like normal array" do
     f1=Friendship.new
     f1.id=1
@@ -16,17 +17,17 @@ describe FriendshipCollection do
     f3=Friendship.new
     f3.id=2
     f3.timestamp=10.days.ago
-    
+
     a=FriendshipCollection.new
     a.class.should eq FriendshipCollection
     a.push f1
     a.push f2
     a.push f3
-    
+
     a.length.should eq 3
     a.ids.should eq [1,1,2]
   end
-  
+
   it "should do array subtract" do
     #assume friends from time A
     f1=Friendship.new
@@ -44,14 +45,14 @@ describe FriendshipCollection do
     f3=Friendship.new
     f3.id=2
     f3.timestamp=3.days.ago
-    
+
     b=FriendshipCollection.new
     b.push f2
     b.push f3
-    
+
     #any new friends
     new_friends=b-a
-    
+
     new_friends.length.should eq 1
     new_friends.first.id.should eq 2
   end

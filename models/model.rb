@@ -1,31 +1,30 @@
 require 'redis'
+require 'time'
 
 class Model
 
   #THIS IS ALL TEMP UNTIL PERSISTANCE LOGIC ADDED
-  attr_reader :length
   def initialize()
-    @length=0
     @hash={}
     @r=Redis.new
   end
   #THIS IS ALL TEMP UNTIL PERSISTANCE LOGIC ADDED
 
 
-
-  #save shouldn't use read....
-  #this does :(
   def save
-    raise "blank id" if id.blank?
+    raise "blank id" if nil?
     @hash.each do |timestamp, bucket|
       bucket.each do |node|
         event=node[:event]
         follower=node[:follower]
         followee=node[:followee]
         key="users:#{id}:timestamp:#{timestamp.to_i}"
-        puts "saving #{key}"
+        #puts "saving #{key}"
         obj=node
         @r.sadd key, obj
+
+        #add this to the list so I can find this key for lookup later
+        @r.zadd "users:#{id}:timestamps", 0, timestamp.to_i
       end
     end
   end
@@ -36,11 +35,21 @@ class Model
     u
   end
 
-  def read(from, to, user_id, filter) #filter = :friends | :followers
+  def read(from=3.years.ago, to=Time.now, user_id, filter) #filter = :friends | :followers
+
+    zkey="users:#{user_id}:timestamps"
+    all_ts=@r.zrange(zkey, 0, -1).collect(&:to_i)
+    timestamps=get_range(all_ts, from.to_i, to.to_i)
+
+    hash=build_hash_from_redis(timestamps, user_id)
+
+    #ap @hash
+
+
     collection=FriendshipCollection.new
 
-    @hash.each do |timestamp, bucket|
-      if(timestamp<=from)
+    hash.each do |timestamp, bucket|
+      if(from <= timestamp && timestamp <= to)
         bucket.each do |node|
           event=node[:event]
           follower=node[:follower]
@@ -51,7 +60,6 @@ class Model
 
           if(filter==:friends)
             if(follower==user_id)
-              #this is a freind node, update collection
               f.id=followee
               if(event==:follow)
                 collection.push f
@@ -61,7 +69,6 @@ class Model
             end
           elsif(filter==:followers)
             if(followee==user_id)
-              #this is a follower node, update collection
               f.id=follower
               if(event==:follow)
                 collection.push f
@@ -110,78 +117,35 @@ class Model
     #     collection
   end
 
+  def build_hash_from_redis(timestamps, user_id)
+    hash={}
+    timestamps.each do |ts|
+      key="users:#{user_id}:timestamp:#{ts}"
+      resp=@r.smembers(key)
+      hashes=deseralize_redis(resp)
+
+      time=Time.at(ts)
+      hash[time]=[] if hash[time].nil?
+      hashes.each do |struct|
+        hash[time].push struct
+      end
+    end
+    hash
+  end
+  
   private
   def deseralize_redis(r)
     r.collect{|str| eval str}
   end
 
+  def get_range(arry, s, e)
+    a=[]
+    arry.each do |i|
+      a.push i if(s <= i && i <= e)
+    end
+    a
+  end
+
+
+
 end
-
-# users:XXXX:followers:timestamp:2012.07.23:event = follow
-# users:XXXX:followers:timestamp:2012.07.23:follower = 4
-# users:XXXX:followers:timestamp:2012.07.23:followee = 1
-
-# users:XXXX:friends:timestamp:2012.07.19:event = follow
-# users:XXXX:friends:timestamp:2012.07.19:follower = 1
-# users:XXXX:friends:timestamp:2012.07.19:followee = 2
-
-# users:XXXX:friends:timestamp:2012.07.23:event = follow
-# users:XXXX:friends:timestamp:2012.07.23:follower = 1
-# users:XXXX:friends:timestamp:2012.07.23:follower = 23
-# users:XXXX:friends:timestamp:2012.07.23:event = follow
-# users:XXXX:friends:timestamp:2012.07.23:follower = 1
-# users:XXXX:friends:timestamp:2012.07.23:follower = 23
-
-#
-# #<User:0x7fe08dd169b8
-#     attr_accessor :followers = #<Timeline:0x7fe08dd16940
-#         attr_reader :hash = {
-#             "2012.07.23" => [
-#                 [0] {
-#                        :event => :follow,
-#                     :follower => 4,
-#                     :followee => 1
-#                 }
-#             ]
-#         },
-#         attr_reader :length = 1
-#     >,
-#     attr_accessor :friends = #<Timeline:0x7fe08dd16990
-#         attr_reader :hash = {
-#             "2012.07.19" => [
-#                 [0] {
-#                        :event => :follow,
-#                     :follower => 1,
-#                     :followee => 2
-#                 }
-#             ],
-#             "2012.07.22" => [
-#                 [0] {
-#                        :event => :follow,
-#                     :follower => 1,
-#                     :followee => 3
-#                 }
-#             ],
-#             "2012.07.23" => [
-#                 [0] {
-#                        :event => :follow,
-#                     :follower => 1,
-#                     :followee => 23
-#                 },
-#                 [1] {
-#                        :event => :follow,
-#                     :follower => 1,
-#                     :followee => 33
-#                 }
-#             ],
-#             "2012.07.24" => [
-#                 [0] {
-#                        :event => :unfollow,
-#                     :follower => 1,
-#                     :followee => 2
-#                 }
-#             ]
-#         },
-#         attr_reader :length = 5
-#     >,
-#     attr_accessor :id = 1

@@ -4,6 +4,7 @@ require './models/model'
 require 'active_support/all'
 require 'redis'
 
+
 RSpec.configure do |config|
   config.before(:suite) do
     puts "before suite"
@@ -38,6 +39,7 @@ def get_user1
 
   #add follers
   long_user.add_follower(5.days.ago, 3)
+  long_user.save
 
   long_user
 end
@@ -47,7 +49,7 @@ def get_user2
   me=u.id=1
   u.add_friend(10.days.ago,  4)
   u.add_friend(10.days.ago, 5)
-  
+  u.save
   u
 end
 
@@ -62,6 +64,7 @@ def get_user3
   u.remove_friend(2.days.ago, 2) #unfollow
   u.add_friend(1.day.ago, 5) # a day ago
   u.add_friend(now, 4)
+  u.save
   u
 end
 
@@ -71,12 +74,13 @@ def get_user4()
   now=Time.now
   day=86400
   u.add_friend(3.days.ago, 2)
-  u.add_friend(2.days.ago, 2)
+  u.add_friend(2.days.ago, 3)
   u.add_friend(1.day.ago, 5) # a day ago
   u.add_friend(now,  4)
-  u.add_friend(3.days.ago,2)
-  u.add_friend(2.days.ago,2)
-  u.add_friend(1.day.ago,  5) # a day ago
-  u.add_friend(now,      4)
+  u.add_friend(3.days.ago,6)
+  u.add_friend(2.days.ago,7)
+  u.add_friend(1.day.ago,  8) # a day ago
+  u.add_friend(now,      9)
+  u.save
   u
 end
