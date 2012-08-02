@@ -52,7 +52,8 @@ describe Model do
      u.add_friend(t,32)
      u.save
    
-     r=Redis.new
+    #this is probalby a dumb test...
+     r=Redis.new(db: 1)
      membs = r.smembers "users:#{u.id}:timestamp:#{t.to_i}"
      f=membs.collect{|str| eval str }[0]
      f[:event].should eq :follow

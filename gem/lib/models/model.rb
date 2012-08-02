@@ -4,7 +4,7 @@ module HighDawn
   class Model
     def initialize(id)
       @hash={}
-      @r=Redis.new
+      @r=REDIS
     end
 
 

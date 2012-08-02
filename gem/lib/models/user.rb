@@ -63,7 +63,11 @@ module HighDawn
 
       f=friends(from: from, to: to)
       b=bros(from: from, to: to)
-      (f - b)
+      diff=(f - b)
+      
+      f=FriendshipCollection.new()
+      f.replace(diff)
+      f
     end
 
     def friends(options={})

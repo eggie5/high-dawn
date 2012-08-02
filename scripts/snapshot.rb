@@ -7,6 +7,8 @@ require 'active_record'
 require 'logger'
 require '../gem/lib/models/user'
 
+REDIS=Redis.new
+
 include HighDawn
 
 
@@ -22,7 +24,7 @@ end
 user_handle="eggie5"
 twitter=TwitterUser.new({handle: user_handle, twitter_config: twitter_config})
 uid=user_id=twitter.uid
-u=User.new;u.id=uid
+u=User.new uid
 p uid
 
 #check if there are any changes from last snapshot -- if not skip

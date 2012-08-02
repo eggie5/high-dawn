@@ -6,6 +6,8 @@ require 'user'
 require 'friendship'
 require 'model'
 
+REDIS=Redis.new(db: 1)
+
 include HighDawn
 
 # Requires supporting files with custom matchers and macros, etc,
@@ -15,8 +17,8 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 RSpec.configure do |config|
   config.before(:suite) do
     puts "before suite"
-    r=Redis.new
-    p r.flushall
+    r=REDIS
+    p r.flushdb
   end
 
   config.before(:all) do
@@ -68,6 +70,16 @@ def get_user3
   u.remove_friend(2.days.ago, 2) #unfollow
   u.add_friend(1.day.ago, 5) # a day ago
   u.add_friend(now, 4)
+  u.save
+  u
+end
+
+
+def user_with_bro_who_has_tweets
+  u=User.new 199983
+  u.add_friend 4
+  u.add_friend 5
+  u.add_follower 4
   u.save
   u
 end

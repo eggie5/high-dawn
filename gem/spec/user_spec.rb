@@ -2,14 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'ap'
 include HighDawn
 
-def user_with_bro_who_has_tweets
-  u=User.new 199983
-  u.add_friend 4
-  u.add_friend 5
-  u.add_follower 4
-  u.save
-  u
-end
 
 describe User do
 
@@ -152,6 +144,11 @@ describe User do
 
     friends.ids.should eq [5,4]
 
+  end
+  
+  it "should return FriendshipCollection for non-bros call" do
+    u=User.new 1242
+    u.non_bros.class.should eq FriendshipCollection
   end
 end
 
