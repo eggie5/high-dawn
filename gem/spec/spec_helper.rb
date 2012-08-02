@@ -38,8 +38,7 @@ end
 def get_user1
   today=now=Time.now
   day=86400
-  long_user=User.new
-  long_user.id=1
+  long_user=User.new 1
   (2..10).each do |i|
     long_user.add_friend(today-day*i,  i)
   end
@@ -52,8 +51,7 @@ def get_user1
 end
 
 def get_user2
-  u=User.new
-  me=u.id=1
+  u=User.new 1
   u.add_friend(10.days.ago,  4)
   u.add_friend(10.days.ago, 5)
   u.save
@@ -61,8 +59,7 @@ def get_user2
 end
 
 def get_user3
-  u=User.new
-  u.id=1
+  u=User.new 1
 
   today=now=Time.now
   day=86400
@@ -76,8 +73,7 @@ def get_user3
 end
 
 def get_user4()
-  u=User.new
-  u.id=7
+  u=User.new 7
   now=Time.now
   day=86400
   u.add_friend(3.days.ago, 2)

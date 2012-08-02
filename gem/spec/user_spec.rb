@@ -3,8 +3,7 @@ require 'ap'
 include HighDawn
 
 def user_with_bro_who_has_tweets
-  u=User.new
-  u.id=me=199983
+  u=User.new 199983
   u.add_friend 4
   u.add_friend 5
   u.add_follower 4
@@ -15,7 +14,7 @@ end
 describe User do
 
   it 'should my followers between april and november' do
-    u=User.new;u.id=881
+    u=User.new 881
     u.add_follower(5.days.ago, 888)
     u.save
 
@@ -32,7 +31,7 @@ describe User do
   end
 
   it "UC #2 - should show date someone followed me" do
-    u=User.new; u.id=88
+    u=User.new 88
     u.add_friend(10.days.ago,  4)
     u.add_friend(9.days.ago, 5)
     u.save
@@ -54,7 +53,7 @@ describe User do
   end
 
   it "UC #1 - should show when somebody became a bro" do
-    u=User.new; u.id=25
+    u=User.new 25
     u.add_friend(10.days.ago, 2)
     u.add_friend(8.days.ago, 3)
     u.add_friend(6.days.ago, 4)
@@ -76,8 +75,7 @@ describe User do
   end
 
   it "should show current bros" do
-    u=User.new
-    u.id=me=231
+    u=User.new 231
     u.add_friend( 4)
     u.add_friend( 5)
     u.save
@@ -97,8 +95,7 @@ describe User do
   end
 
   it "should show current non-bros" do
-    u=User.new
-    u.id=me=1242
+    u=User.new 1242
     u.add_friend(3.days.ago, 4)
     u.add_friend(2.days.ago, 5)
     u.add_follower(1.days.ago, 4)
@@ -112,7 +109,7 @@ describe User do
 
 
   it "should add/remove followers" do
-    u=User.new;u.id=9324
+    u=User.new 9324
     u.add_follower(3.days.ago, 2)
     u.add_follower(2.days.ago,  3)
     u.add_follower(1.day.ago,   5) # a day ago
@@ -140,8 +137,7 @@ describe User do
 
 
   it "should get a list of friends/followers on certain date" do
-    u=User.new
-    u.id=123239
+    u=User.new 123239
     u.add_friend(3.days.ago, 2)
     u.remove_friend(2.days.ago, 2) #unfollow
     u.add_friend(1.day.ago, 5) # a day ago
@@ -161,7 +157,7 @@ end
 
 describe User do
   it "should get a collection of users at a certain point in time" do
-    t=User.new;t.id=234
+    t=User.new 234
 
     t.add(time: 3.days.ago, followee: 2, action: :follow, follower: t.id)
     t.add(time: 2.days.ago, followee: 3, action: :follow, follower: t.id)
@@ -180,7 +176,7 @@ end
 
 describe User, "#add" do
   it "adds even to timeline" do
-    u=User.new; u.id=21
+    u=User.new 21
 
     today=Time.now
     u.add(time: today, followee: 3, action: :follow, follower: 4)
@@ -193,8 +189,7 @@ describe User, "#add" do
 end
 
 def user1
-  u=User.new
-  u.id=1
+  u=User.new 1
   u.add_friend(3.days.ago, 2)
   u.remove_friend(2.days.ago, 2) #unfollow
   u.add_friend(1.day.ago, 5) # a day ago

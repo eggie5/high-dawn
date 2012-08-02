@@ -5,7 +5,7 @@ require 'ap'
 describe Model do
 
   it "should build hash from redis" do
-     u=User.new;u.id=61
+     u=User.new 61
      time=Time.now
      u.add_friend(time,1)
      u.add_friend(time,2)
@@ -18,7 +18,7 @@ describe Model do
      before_hash.keys.length.should eq 2
      #now assert that the correct hash is rebuild from redis
    
-     m=Model.new
+     m=Model.new u.id
      after_hash=m.build_hash_from_redis([time.to_i, 3.days.ago.to_i], u.id)
    
      before_hash.keys.length.should eq after_hash.keys.length
@@ -28,7 +28,7 @@ describe Model do
    
    it "should propery deseralize data structure from redis keys" do
      #seed redis
-     u=User.new;u.id=91
+     u=User.new 91
      t=110.days.ago
      tid=33
      u.add_friend(t, tid)
@@ -36,7 +36,7 @@ describe Model do
    
      #this should populate a new hash from redis
      #THIS WONT PASS UNLESSR READ USES REDIS
-     m=Model.new
+     m=Model.new u.id
      friends = m.read(3.years.ago, Time.now, u.id, :friends)
      friends.class.should eq FriendshipCollection
    
@@ -47,7 +47,7 @@ describe Model do
    
    it "should property seralize data structure to redis keys" do
      #build DS in memory
-     u=User.new;u.id=1
+     u=User.new 1
      t=97.days.ago
      u.add_friend(t,32)
      u.save

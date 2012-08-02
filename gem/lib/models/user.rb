@@ -7,8 +7,9 @@ module HighDawn
   class User < Model
     attr_accessor :id
     attr_reader :hash
-    def initialize()
+    def initialize(twitter_id)
       super
+      @id=twitter_id
     end
 
     def add_friend(ts=Time.now, id)

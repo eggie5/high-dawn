@@ -2,7 +2,7 @@ require 'redis'
 require 'time'
 module HighDawn
   class Model
-    def initialize()
+    def initialize(id)
       @hash={}
       @r=Redis.new
     end
