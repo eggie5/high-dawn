@@ -1,23 +1,19 @@
-require './models/user'
-require 'ap'
+require "rubygems"
+require "bundler/setup"
+require 'twitter'
+require 'redis'
+require 'high-dawn'
 
-#write example
-def write
-u=User.new;u.id=1
-u.add_friend(3)
-u.add_friend(100)
-u.add_follower(2)
-
-u.save
+#load creds from yaml
+yaml = YAML.load_file("./oauth.yaml")
+Twitter.configure do |config|
+  config.consumer_key = yaml["consumer_key"]
+  config.consumer_secret = yaml["consumer_secret"]
+  config.oauth_token = yaml["oauth_token"]
+  config.oauth_token_secret = yaml["oauth_token_secret"]
 end
 
+REDIS=Redis.new
 
-#read example
-def _read
-  u=User.find(1)
-  u.friends
-  ap u
-  
-end
 
-write
+HighDawn::Snapshot.snapshot
