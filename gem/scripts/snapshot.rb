@@ -22,7 +22,7 @@ module HighDawn
       #check if there are any changes from last snapshot -- if not skip
       a_friends=u.friends.ids
       a_followers=u.followers.ids
-
+      
       b_friends=twitter.friends
       b_followers=twitter.followers
 
@@ -54,10 +54,32 @@ module HighDawn
         u.remove_follower(lf)
       end
 
-
       p u.save
+
+      p new_friends.class
+      p new_followers.class
+      self.cache_usernames(new_friends + new_followers)
     end
 
-  end
+    def self.cache_usernames(ids)
+      #cache user names
+      twitter=TwitterUser.new
+      screen_names=[]
+      
+      ids.each_slice(99).to_a.each do |arr|
+        _screen_names=twitter.client.friendships(arr).map{|user| [user.screen_name, user.id]}
+        
+        _screen_names.each do |screen_name|
+          puts "tuid:#{screen_name[1]}=#{screen_name[0]}"
+          REDIS.pipelined do
+            REDIS.set("tuid:#{screen_name[1]}", screen_name[0])
+          end
+        end
+        screen_names.concat _screen_names
+      end
+      screen_names
+    end
 
-end
+  end #end class
+
+end#module
