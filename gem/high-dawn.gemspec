@@ -4,37 +4,47 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{high-dawn}
+  s.name = "high-dawn"
   s.version = "0.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = [%q{Alex Egg}]
-  s.date = %q{2012-08-02}
-  s.description = %q{for project high-dawn}
-  s.email = %q{eggie5@gmail.com}
+  s.authors = ["Alex Egg"]
+  s.date = "2012-08-03"
+  s.description = "for project high-dawn"
+  s.email = "eggie5@gmail.com"
   s.files = [
-    "VERSION"
+    "Gemfile",
+    "Gemfile.lock",
+    "Guardfile",
+    "LICENSE.txt",
+    "README.rdoc",
+    "Rakefile",
+    "VERSION",
+    "high-dawn.gemspec",
+    "lib/high-dawn.rb",
+    "lib/models/friendship.rb",
+    "lib/models/model.rb",
+    "lib/models/tweet.rb",
+    "lib/models/user.rb",
+    "runner.rb",
+    "spec/friendship_spec.rb",
+    "spec/high-dawn_spec.rb",
+    "spec/model_spec.rb",
+    "spec/spec_helper.rb",
+    "spec/user_spec.rb"
   ]
-  s.homepage = %q{http://github.com/eggie5/high-dawn}
-  s.licenses = [%q{MIT}]
-  s.require_paths = [%q{lib}]
-  s.rubygems_version = %q{1.8.6}
-  s.summary = %q{models for twitter/redis data store}
+  s.homepage = "http://github.com/eggie5/high-dawn"
+  s.licenses = ["MIT"]
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.8.24"
+  s.summary = "models for twitter/redis data store"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<twitter>, [">= 0"])
       s.add_runtime_dependency(%q<awesome_print>, [">= 0"])
-      s.add_runtime_dependency(%q<tweetstream>, [">= 0"])
-      s.add_runtime_dependency(%q<resque>, [">= 0"])
       s.add_runtime_dependency(%q<redis>, ["= 3.0.0"])
-      s.add_runtime_dependency(%q<activerecord>, [">= 0"])
-      s.add_runtime_dependency(%q<pg>, [">= 0"])
-      s.add_runtime_dependency(%q<capistrano>, [">= 0"])
-      s.add_runtime_dependency(%q<capify-ec2>, [">= 0"])
-      s.add_runtime_dependency(%q<god>, [">= 0"])
       s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, [">= 0"])
@@ -49,16 +59,8 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rspec-expectations>, [">= 0"])
       s.add_development_dependency(%q<rspec-mocks>, [">= 0"])
     else
-      s.add_dependency(%q<twitter>, [">= 0"])
       s.add_dependency(%q<awesome_print>, [">= 0"])
-      s.add_dependency(%q<tweetstream>, [">= 0"])
-      s.add_dependency(%q<resque>, [">= 0"])
       s.add_dependency(%q<redis>, ["= 3.0.0"])
-      s.add_dependency(%q<activerecord>, [">= 0"])
-      s.add_dependency(%q<pg>, [">= 0"])
-      s.add_dependency(%q<capistrano>, [">= 0"])
-      s.add_dependency(%q<capify-ec2>, [">= 0"])
-      s.add_dependency(%q<god>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, [">= 0"])
@@ -74,16 +76,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rspec-mocks>, [">= 0"])
     end
   else
-    s.add_dependency(%q<twitter>, [">= 0"])
     s.add_dependency(%q<awesome_print>, [">= 0"])
-    s.add_dependency(%q<tweetstream>, [">= 0"])
-    s.add_dependency(%q<resque>, [">= 0"])
     s.add_dependency(%q<redis>, ["= 3.0.0"])
-    s.add_dependency(%q<activerecord>, [">= 0"])
-    s.add_dependency(%q<pg>, [">= 0"])
-    s.add_dependency(%q<capistrano>, [">= 0"])
-    s.add_dependency(%q<capify-ec2>, [">= 0"])
-    s.add_dependency(%q<god>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, [">= 0"])

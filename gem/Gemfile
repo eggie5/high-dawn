@@ -3,7 +3,6 @@ source "http://rubygems.org"
 
 gem 'awesome_print'
 gem 'redis', '3.0.0'
-gem 'pg'
 gem 'activesupport'
 
 # Add dependencies to develop your gem here.
