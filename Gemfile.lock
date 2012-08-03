@@ -1,10 +1,11 @@
 PATH
   remote: ./gem
   specs:
-    high-dawn (0.0.0)
+    high-dawn (0.2.0)
       activesupport
       awesome_print
       redis (= 3.0.0)
+      twitter
 
 GEM
   remote: https://rubygems.org/

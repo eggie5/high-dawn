@@ -55,9 +55,7 @@ module HighDawn
       end
 
       p u.save
-
-      p new_friends.class
-      p new_followers.class
+      
       self.cache_usernames(new_friends + new_followers)
     end
 
