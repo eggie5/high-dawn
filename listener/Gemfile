@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'high-dawn', :path => "../gem"
+gem 'tweetstream'
+gem 'resque'
+gem 'activerecord'
+gem 'pg'
