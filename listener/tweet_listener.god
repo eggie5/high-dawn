@@ -3,8 +3,8 @@ require 'twitter'
 
 God.watch do |w|
   w.name = "tweet_listener"
-  w.dir = '/Users/eggie5/Development/high-dawn/'
-  w.start = "bundle exec ruby ./tweet_listener.rb"
+  w.dir = '/Users/eggie5/Development/high-dawn/listener/'
+  w.start = "bundle exec ruby ./runner.rb"
   w.keepalive(:memory_max => 150.megabytes,
   :cpu_max => 50.percent)
 
@@ -33,8 +33,8 @@ God.contact(:twitter) do |c|
   c.name = 'eggie5'
   c.consumer_token = 'gOhjax6s0L3mLeaTtBWPw'  # default for god
   c.consumer_secret = 'yz4gpAVXJHKxvsGK85tEyzQJ7o2FEy27H1KEWL75jfA'  #default for god
-  c.access_token = '155416821-GxjA7UDy0gh4WGduZGljPwBjmIpmujFOE3TRAZYd'
-  c.access_secret = 'gDjoY0IH8EUV8nrmWKLIDRxPLJM8NbroT06K35KO8U'
+  c.access_token = '758758610-K4rH4tVJnshaVe3yQIoytCmE1fNpMntMX0pRcTPq'
+  c.access_secret = 'qqt6iHEdRkltFSOT1e8Svsy7IVbX0cY8JK72S1Ig'
 end
 
 
