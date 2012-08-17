@@ -26,10 +26,11 @@ module HighDawn
 
     def self.ids
       if(ENV["HD_ENV"]=="production")
-        self.log "Running in production!"
-       p url="http://high-dawn-7765.herokuapp.com/uids.json"
+        url="http://high-dawn-7765.herokuapp.com/uids.json"
+        self.log "Running in production! #{url}"
       else
-       p url="http://localhost:5200/uids.json"
+        url="http://localhost:5200/uids.json"
+        self.log "Running in local #{url}"
       end
 
       #collect list of all non_bros for every user
@@ -69,7 +70,7 @@ module HighDawn
 
         next if htweet.retweet? #dont care about retweets
         obj={uid: tweet.user.id, text: tweet.text }
-        Listener.log obj 
+        Listener.log obj
 
         #get a list of users following this tweet's owner
         followers = non_bro.followers

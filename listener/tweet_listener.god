@@ -8,7 +8,7 @@ God.watch do |w|
   w.name = "tweet_listener"
   w.dir = File.dirname(__FILE__)
   w.start = "bundle exec ruby ./runner.rb"
-w.log = '/var/log/myprocess.log'
+  #w.log = '/var/log/myprocess.log'
   w.keepalive(:memory_max => 150.megabytes,
   :cpu_max => 50.percent)
 
