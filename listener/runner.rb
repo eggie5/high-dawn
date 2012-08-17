@@ -30,7 +30,7 @@ REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.passwor
 dbconfig = YAML::load(File.open('./database.yml'))
 # ap dbconfig
 
-p user_ids = HighDawn::Listener.ids
+user_ids = HighDawn::Listener.ids
 
 listener = HighDawn::Listener.new
 listener.listen_to user_ids
