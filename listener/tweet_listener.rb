@@ -62,15 +62,15 @@ module HighDawn
       client.follow(non_bros) do |tweet|
         htweet = HighDawn::Tweet.create text: tweet.text, tuid: tweet.user.id
         next if htweet.retweet? #dont care about retweets
-        obj={uid: tweet.user.id, text: tweet.text }
+        obj={uid: tweet.user.screen_name, text: tweet.text }
         Listener.log obj
 
         #get a list of users following this tweet's owner
         non_bro = HighDawn::NonBro.new(tweet.user.id)
         followers = non_bro.followers
         next if followers.empty? #skip if no followers
-        
-        Listener.log "caching id #{tweet.user.screen_name} and saving his tweet to subscribers: #{followers}"        
+
+        Listener.log "caching id #{tweet.user.screen_name} and saving his tweet to subscribers: #{followers}"
         HighDawn::TweetModel.cache_id(non_bro.id, tweet.user.screen_name)
 
         followers.each do |id|
