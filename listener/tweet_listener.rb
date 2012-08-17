@@ -27,9 +27,9 @@ module HighDawn
     def self.ids
       if(ENV["HD_ENV"]=="production")
         self.log "Running in production!"
-        url="http://high-dawn-7765.herokuapp.com/uids.json"
+       p url="http://high-dawn-7765.herokuapp.com/uids.json"
       else
-        url="http://localhost:5200/uids.json"
+       p url="http://localhost:5200/uids.json"
       end
 
       #collect list of all non_bros for every user
