@@ -1,7 +1,7 @@
 PATH
   remote: ./gem
   specs:
-    high-dawn (0.15.0)
+    high-dawn (0.17.0)
       activesupport
       awesome_print
       redis (= 3.0.0)

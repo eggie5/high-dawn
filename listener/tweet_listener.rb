@@ -5,10 +5,8 @@ require "bundler/setup"
 require "tweetstream"
 require 'high-dawn'
 require 'resque'
-require 'active_record'
-
-class User < ActiveRecord::Base
-end
+require "net/http"
+require "uri"
 
 module HighDawn
   class Listener
@@ -23,16 +21,24 @@ module HighDawn
     end
 
     def self.ids
+      if(ENV["HD_ENV"]=="production")
+        url="http://high-dawn-7765.herokuapp.com/uids.json"
+      else
+        url="http://localhost:5200/uids.json"
+      end
+      
       #collect list of all non_bros for every user
-      #TODO: convert this AR call to REST API call
-      ids=[]
-      ::User.all.each do |user|
-        user=HighDawn::User.new user.uid.to_i
+      uri = URI.parse(url)
+      response = Net::HTTP.get_response(uri)
+      _uids=JSON.parse response.body
+      uids=[]
+      _uids.each do |uid|
+        user=HighDawn::User.new uid.to_i
         user_ids=user.non_bros.ids
-        ids.concat user_ids
+        uids.concat user_ids
       end
 
-      ids
+      uids
     end
 
 
@@ -51,13 +57,14 @@ module HighDawn
       client.follow(non_bros) do |tweet|
         htweet = HighDawn::Tweet.create text: tweet.text, tuid: tweet.user.id
         non_bro = HighDawn::NonBro.new(tweet.user.id)
-        #p obj={id: tweet.id, uid: tweet.user.id, text: tweet.text }
+
 
         #cache id -> uname for O(1) lookup
         HighDawn::TweetModel.cache_id non_bro.id, tweet.user.screen_name
 
         next if htweet.retweet? #dont care about retweets
-        puts "."
+        p obj={id: tweet.id, uid: tweet.user.id, text: tweet.text }
+        # puts "."
 
         #get a list of users following this tweet's owner
         p followers = non_bro.followers
