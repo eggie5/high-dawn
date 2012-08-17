@@ -1,5 +1,6 @@
 webapp
 listener/database.yml
+listener/tweet_listener.log
 gem
 old/
 oauth.yaml
