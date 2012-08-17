@@ -40,13 +40,12 @@ module HighDawn
       uids=[]
       _uids.each do |uid|
         user=HighDawn::User.new uid.to_i
-        user_ids=user.non_bros.ids
+        user_ids=user.watch_list
         uids.concat user_ids
       end
       self.log "found #{uids.length} uids to monitor"
       uids
     end
-
 
     def listen_to(non_bros)
       Listener.log "listening..."
@@ -62,19 +61,18 @@ module HighDawn
 
       client.follow(non_bros) do |tweet|
         htweet = HighDawn::Tweet.create text: tweet.text, tuid: tweet.user.id
-        non_bro = HighDawn::NonBro.new(tweet.user.id)
-
-
-        #cache id -> uname for O(1) lookup
-        HighDawn::TweetModel.cache_id non_bro.id, tweet.user.screen_name
-
         next if htweet.retweet? #dont care about retweets
         obj={uid: tweet.user.id, text: tweet.text }
         Listener.log obj
 
         #get a list of users following this tweet's owner
+        non_bro = HighDawn::NonBro.new(tweet.user.id)
         followers = non_bro.followers
-        Listener.log followers unless followers.empty?
+        next if followers.empty? #skip if no followers
+        
+        Listener.log "caching id #{tweet.user.screen_name} and saving his tweet to subscribers: #{followers}"        
+        HighDawn::TweetModel.cache_id(non_bro.id, tweet.user.screen_name)
+
         followers.each do |id|
           u=HighDawn::User.new id
           u.queue << htweet
