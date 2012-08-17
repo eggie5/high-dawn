@@ -9,7 +9,7 @@ require "net/http"
 require "uri"
 
 # Start the log over whenever the log exceeds 100 megabytes in size.
-$LOG = Logger.new('tweet_listener.log', 0, 100 * 1024 * 1024)
+$LOG = Logger.new(File.dirname(__FILE__)+"/tweet_listener.log", 0, 100 * 1024 * 1024)
 $LOG.formatter = proc do |severity, datetime, progname, msg|
   "#{datetime}: #{msg}\n"
 end

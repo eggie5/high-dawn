@@ -3,7 +3,7 @@ require 'twitter'
 
 God.watch do |w|
   w.name = "tweet_listener"
-  w.dir = '/Users/eggie5/Development/high-dawn/listener/'
+  w.dir = File.dirname(__FILE__)
   w.start = "bundle exec ruby ./runner.rb"
   w.keepalive(:memory_max => 150.megabytes,
   :cpu_max => 50.percent)
